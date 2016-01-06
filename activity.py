@@ -144,12 +144,22 @@ class VteActivity(ViewSourceActivity):
         self._vte.set_size_request(200, 300)
         font = 'Monospace 10'
         self._vte.set_font(Pango.FontDescription(font))
-        self._vte.set_colors(Gdk.RGBA.from_color(Gdk.Color.parse('#000000')[1]),
-                             Gdk.RGBA.from_color(Gdk.Color.parse('#E7E7E7')[1]),
-                             [])
         self._vte.drag_dest_set(Gtk.DestDefaults.ALL,
                                 [Gtk.TargetEntry.new("text/plain", 0, TARGET_TYPE_TEXT)],
                                 Gdk.DragAction.COPY)
+
+        foreground = Gdk.Color.parse('#000000')[1]
+        background = Gdk.Color.parse('#E7E7E7')[1]
+
+        try:
+            self._vte.set_colors(foreground,
+                                 background,
+                                 [])
+
+        except TypeError:
+            self._vte.set_colors(Gdk.RGBA.from_color(foreground),
+                                 Gdk.RGBA.from_color(background),
+                                 [])
 
         self._vte.connect('selection-changed', self._on_selection_changed_cb)
         self._vte.connect('drag_data_received', self._on_drop_cb)
