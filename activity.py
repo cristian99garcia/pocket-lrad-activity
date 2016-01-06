@@ -67,14 +67,14 @@ class ViewSourceActivity(activity.Activity):
         return False
 
     def view_source(self):
-        """Implement the 'view source' key by saving pippy_app.py to the
+        """Implement the 'view source' key by saving app.py to the
         datastore, and then telling the Journal to view it."""
         if self.__source_object_id is None:
             jobject = datastore.create()
             metadata = {
                 'title': _('%s Source') % get_bundle_name(),
                 'title_set_by_user': '1',
-                'suggested_filename': 'pippy_app.py',
+                'suggested_filename': 'app.py',
                 'icon-color': profile.get_color().to_string(),
                 'mime_type': 'text/x-python',
             }
@@ -82,7 +82,7 @@ class ViewSourceActivity(activity.Activity):
             for k,v in metadata.items():
                 jobject.metadata[k] = v # dict.update method is missing =(
 
-            jobject.file_path = os.path.join(get_bundle_path(), 'pippy_app.py')
+            jobject.file_path = os.path.join(get_bundle_path(), 'app.py')
             datastore.write(jobject)
             self.__source_object_id = jobject.object_id
             jobject.destroy()
@@ -188,7 +188,7 @@ class VteActivity(ViewSourceActivity):
         argv = [
             "/bin/sh",
             "-c",
-            "python %s/pippy_app.py; sleep 1" % bundle_path
+            "python %s; sleep 1" % os.path.join(bundle_path, "app.py")
         ]
 
         args = (
@@ -237,11 +237,11 @@ class PyGameActivity(ViewSourceActivity):
 
         if self.child_pid == 0:
             library_path = os.path.join(activity.get_bundle_path(), 'library')
-            pippy_app_path = os.path.join(activity.get_bundle_path(), 'pippy_app.py')
+            app_path = os.path.join(activity.get_bundle_path(), 'app.py')
             sys.path[0:0] = [library_path]
             g = globals()
             g['__name__'] = '__main__'
-            execfile(pippy_app_path, g, g) # start pygame
+            execfile(app_path, g, g) # start pygame
             sys.exit(0)
 
         super(PyGameActivity, self).__init__(handle)
